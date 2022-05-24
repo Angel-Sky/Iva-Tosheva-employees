@@ -9,6 +9,7 @@ function solve() {
         e.preventDefault();
         let regex = /^([a-zA-Z0-9\s_\\.\-:])+(.csv|.txt)$/;
         if (regex.test(uploadedFile.value.toLowerCase())) {
+            table.innerHTML = "";
             let reader = new FileReader();
             reader.onload = function (e) {
                 fileData = e.target.result.split("\n");
@@ -81,27 +82,36 @@ function solve() {
         let arrMostCommonDaysProjects = [];
         let arrOfData = Object.values(data)
             .sort((a, b) => (b.workedDays - a.workedDays))
-            
+
         for (let i in arrOfData) {
             if (Number(i) + 1 < arrOfData.length &&
                 arrOfData[i].workedDays >= arrOfData[Number(i) + 1].workedDays) {
-                    arrMostCommonDaysProjects.push(arrOfData[i])
+                arrMostCommonDaysProjects.push(arrOfData[i])
             }
         }
 
         return arrMostCommonDaysProjects;
     }
 
-    function renderData(data) {
-        console.log(data)
-        // for (let i = 0; i < data.length; i++) {
-        //     let row = table.insertRow(-1);
-        //     let cells = data[i].split(",");
-        //     for (let j = 0; j < cells.length; j++) {
-        //         let cell = row.insertCell(-1);
-        //         cell.innerHTML = cells[j];
-        //     }
-        // }
+    function renderData(projects) {
+        let headers = ['Employee ID #1', 'Employee ID #2', 'Project ID', 'Days worked']
+        let row = table.insertRow(-1);
+
+        for (let k = 0; k < headers.length; k++) {
+            let cell = row.insertCell(-1);
+            cell.innerHTML = headers[k];
+        }
+
+        for (let i = 0; i < projects.length; i++) {
+            let innerRow = table.insertRow(-1);
+            let cells = [projects[i].id, projects[i].data[0], projects[i].data[3], projects[i].workedDays];
+
+            for (let j = 0; j < cells.length; j++) {
+                let cell = innerRow.insertCell(-1);
+                cell.innerHTML = cells[j];
+            }
+
+        }
         output.innerHTML = "";
         output.appendChild(table);
     }
