@@ -13,7 +13,7 @@ function solve() {
             reader.onload = function (e) {
                 fileData = e.target.result.split("\n");
                 // console.log(fileData)
-                findTheLongestPeriod(formatData(fileData));
+                findWorkingDays(formatData(fileData));
                 renderData(fileData);
             }
             reader.readAsText(uploadedFile.files[0]);
@@ -27,15 +27,15 @@ function solve() {
         data.shift();
         data.forEach(row => {
             let [empID, projectID, dateFrom, dateTo] = row.split(", ");
-            dateTo = dateTo.substring(0, dateTo.length - 1)
+            // dateTo = dateTo.substring(0, dateTo.length - 1)
             let currentProject = projects.find(el => el.id == projectID)
 
-            if (dateTo == 'NULL') {
+            if (dateTo == 'NULL' || dateTo == 'NULL\r') {
                 dateTo = new Date().toISOString().slice(0, 10);
             }
 
             if (currentProject == undefined) {
-                projects.push(({ id: projectID, data: [empID, dateFrom, dateTo] }))
+                projects.push(({ id: projectID, data: [empID, dateFrom, dateTo], workedDays: 0 }))
             } else {
                 currentProject.data.push(empID, dateFrom, dateTo)
             }
@@ -49,11 +49,33 @@ function solve() {
         return projects;
     }
 
-    function findTheLongestPeriod(data) {
+    function findWorkedDays(data) {
         for (let project of data) {
-            let [empl1ID, empl1StartDate, empl1EndDate, empl2ID, emlp2StartDate, empl2EndDate] = project.data;
-            console.log(project)
+            let [empl1ID, startOne, endOne, empl2ID, startTwo, endTwo] = project.data;
+            let diff = 0;
+            startOne = Date.parse(startOne) / 1000;
+            endOne = Date.parse(endOne) / 1000;
+            startTwo = Date.parse(startTwo) / 1000;
+            endTwo = Date.parse(endTwo) / 1000;
+        
+            if ((startTwo >= startOne && startTwo <= endOne)) {
+                if (endTwo > endOne) {
+                   diff = endOne - startTwo
+                } else {
+                    diff = endTwo - startTwo
+                }
+            } else if (startOne >= startTwo && startOne <= endTwo) {
+                if (endOne > endTwo) {
+                    diff = endTwo - endTwo;
+                } else {
+                    diff = endOne - startOne;
+                }
+            }
+
+            diff = (Math.ceil(diff / 86400));
+            project.workDays = diff;
         }
+        return data;
     }
 
     function renderData(data) {
