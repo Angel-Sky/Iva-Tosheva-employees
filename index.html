@@ -5,30 +5,20 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Employees</title>
     <script src="./app.js"></script>
+    <script>window.addEventListener('DOMContentLoaded', () => { solve(); });</script>
     <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
-    <label for="employees">Choose a file with employees:</label>
+    <label for="employeesUpload">Choose a file with employees:</label>
+    <input type="file" id="employeesUpload" name="employees" accept=".csv">
+    <input type="submit" value="Submit" id="btn-submit-employees"/>
 
-    <input type="file" id="employees" name="employees" accept=".csv">
-
-    <table >
-        <tr>
-            <th>Employee ID#1</th>
-            <th>Employee ID#2</th>
-            <th>Project ID</th>
-            <th>Days worked</th>
-        </tr>
-        <tr>
-            <td>1434</td>
-            <td>1578</td>
-            <td>939392385238</td>
-            <td>30</td>
-        </tr>
-    </table>
+    <div id="result">
+        
+    </div>
 </body>
 
 </html>
