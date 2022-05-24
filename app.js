@@ -3,6 +3,8 @@ function solve() {
     let fileData;
     let table = document.createElement("table");
     let output = document.getElementById("result");
+    let error = document.createElement("div");
+    error.setAttribute("id", "error");
     document.querySelector("#btn-submit-employees").addEventListener("click", addEvent);
 
     function addEvent(e) {
@@ -17,7 +19,8 @@ function solve() {
             }
             reader.readAsText(uploadedFile.files[0]);
         } else {
-            alert("Please upload a valid CSV file.");
+            error.innerHTML = "Please upload a valid CSV file."
+            output.appendChild(error);
         }
     }
 
@@ -79,40 +82,46 @@ function solve() {
 
     function filterProjects(fileData) {
         let data = findCommonDays(formatData(fileData))
-        let arrMostCommonDaysProjects = [];
-        let arrOfData = Object.values(data)
+        let filtered = [];
+        Object.values(data)
             .sort((a, b) => (b.workedDays - a.workedDays))
+            .reduce((prev, current) => {
+                if (prev.workedDays > current.workedDays) {
+                    return prev;
+                } else {
+                    filtered.push(current);
+                    return current
+                }
+            }, [filtered])
 
-        for (let i in arrOfData) {
-            if (Number(i) + 1 < arrOfData.length &&
-                arrOfData[i].workedDays >= arrOfData[Number(i) + 1].workedDays) {
-                arrMostCommonDaysProjects.push(arrOfData[i])
-            }
-        }
-
-        return arrMostCommonDaysProjects;
+        return filtered;
     }
 
     function renderData(projects) {
-        let headers = ['Employee ID #1', 'Employee ID #2', 'Project ID', 'Days worked']
-        let row = table.insertRow(-1);
+        if (projects.length > 0) {
+            let headers = ['Employee ID #1', 'Employee ID #2', 'Project ID', 'Days worked']
+            let row = table.insertRow(-1);
 
-        for (let k = 0; k < headers.length; k++) {
-            let cell = row.insertCell(-1);
-            cell.innerHTML = headers[k];
-        }
-
-        for (let i = 0; i < projects.length; i++) {
-            let innerRow = table.insertRow(-1);
-            let cells = [projects[i].id, projects[i].data[0], projects[i].data[3], projects[i].workedDays];
-
-            for (let j = 0; j < cells.length; j++) {
-                let cell = innerRow.insertCell(-1);
-                cell.innerHTML = cells[j];
+            for (let k = 0; k < headers.length; k++) {
+                let cell = row.insertCell(-1);
+                cell.innerHTML = headers[k];
             }
 
+            for (let i = 0; i < projects.length; i++) {
+                let innerRow = table.insertRow(-1);
+                let cells = [projects[i].id, projects[i].data[0], projects[i].data[3], projects[i].workedDays];
+
+                for (let j = 0; j < cells.length; j++) {
+                    let cell = innerRow.insertCell(-1);
+                    cell.innerHTML = cells[j];
+                }
+
+            }
+            output.innerHTML = "";
+            output.appendChild(table);
+        } else {
+            error.innerHTML = "There isn't any pair of employees who have worked together"
+            output.appendChild(error);
         }
-        output.innerHTML = "";
-        output.appendChild(table);
     }
 }
