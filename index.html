@@ -12,13 +12,17 @@
 </head>
 
 <body>
-    <label for="employeesUpload">Choose a file with employees:</label>
-    <input type="file" id="employeesUpload" name="employees" accept=".csv">
-    <input type="submit" value="Submit" id="btn-submit-employees"/>
-
-    <div id="result">
-        
+    <h1>Pair of employees who have worked together</h1>
+    <h3>The application identifies the pair of employees who have worked
+        together on common projects for the longest period of time.</h2>
+    <p>Please upload a CSV file with data in the following format:
+        EmpID, ProjectID, DateFrom, DateTo</p>
+    <div id="fileInput">
+        <label for="employeesUpload">Choose a file with employees:</label>
+        <input type="file" id="employeesUpload" name="employees" accept=".csv">
+        <input type="submit" value="Submit" id="btn-submit-employees" />
     </div>
+    <div id="result"></div>
 </body>
 
 </html>

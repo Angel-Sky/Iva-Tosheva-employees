@@ -1,0 +1,49 @@
+body {
+    text-align: center;
+    font-family: sans-serif;
+}
+
+h1 {
+    color:#3A75B5;
+}
+
+#fileInput {
+    width: 700px;
+    margin: 0 auto;
+}
+
+#result table {
+    margin: 0 auto;
+    padding-top: 30px;
+}
+
+td {
+    padding: 10px;
+    border: 1px solid #3A75B5;
+}
+
+#btn-submit-employees {
+    display: block;
+    margin: 0 auto;
+    margin-top: 30px;
+    color: #ffffff;
+    background-color: #3a75b5;
+    font-size: 16px;
+    border: 1px solid #2d63c8;
+    border-radius: 50px;
+    padding: 15px 50px;
+    letter-spacing: 1px;
+    cursor: pointer
+}
+
+#btn-submit-employees:hover {
+    color: #2d63c8;
+    background-color: #ffffff;
+}
+
+#error {
+    padding: 20px;
+    color: red;
+    background: #ff00002e;
+    margin-top: 10px;
+}
