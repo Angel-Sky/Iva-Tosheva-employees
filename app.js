@@ -12,7 +12,8 @@ function solve() {
             let reader = new FileReader();
             reader.onload = function (e) {
                 fileData = e.target.result.split("\n");
-                console.log(fileData)
+                // console.log(fileData)
+                console.log(formatData(fileData));
                 renderData(fileData);
             }
             reader.readAsText(uploadedFile.files[0]);
@@ -21,11 +22,26 @@ function solve() {
         }
     }
 
+    function formatData(data) {
+        let projects = [];
+        data.shift();
+        data.forEach(row => {
+            let [empID, projectID, dateFrom, dateTo] = row.split(", ")
+            let currentProject = projects.find(el => el.id == projectID)
+
+            if (currentProject == undefined) {
+                projects.push(({ id: projectID, data: [empID, dateFrom, dateTo] }))
+            } else {
+                currentProject.data.push(empID, dateFrom, dateTo)
+            }
+        })
+        return projects;
+    }
+
     function renderData(data) {
         for (let i = 0; i < data.length; i++) {
             let row = table.insertRow(-1);
             let cells = data[i].split(",");
-            console.log(cells)
             for (let j = 0; j < cells.length; j++) {
                 let cell = row.insertCell(-1);
                 cell.innerHTML = cells[j];
