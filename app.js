@@ -26,8 +26,13 @@ function solve() {
         let projects = [];
         data.shift();
         data.forEach(row => {
-            let [empID, projectID, dateFrom, dateTo] = row.split(", ")
+            let [empID, projectID, dateFrom, dateTo] = row.split(", ");
+            dateTo = dateTo.substring(0, dateTo.length - 1)
             let currentProject = projects.find(el => el.id == projectID)
+
+            if (dateTo == 'NULL') {
+                dateTo = new Date().toISOString().slice(0, 10);
+            }
 
             if (currentProject == undefined) {
                 projects.push(({ id: projectID, data: [empID, dateFrom, dateTo] }))
@@ -45,7 +50,10 @@ function solve() {
     }
 
     function findTheLongestPeriod(data) {
-        console.log(data)
+        for (let project of data) {
+            let [empl1ID, empl1StartDate, empl1EndDate, empl2ID, emlp2StartDate, empl2EndDate] = project.data;
+            console.log(project)
+        }
     }
 
     function renderData(data) {
