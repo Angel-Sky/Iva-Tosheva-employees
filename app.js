@@ -79,12 +79,12 @@ function solve() {
     function filterProjects(fileData) {
         let data = findCommonDays(formatData(fileData))
         let arrMostCommonDaysProjects = [];
-        let arrOfData = Object.entries(data)
-            .sort((a, b) => (b[1].workedDays - a[1].workedDays))
-
+        let arrOfData = Object.values(data)
+            .sort((a, b) => (b.workedDays - a.workedDays))
+            
         for (let i in arrOfData) {
             if (Number(i) + 1 < arrOfData.length &&
-                arrOfData[i][1].workedDays >= arrOfData[Number(i) + 1][1].workedDays) {
+                arrOfData[i].workedDays >= arrOfData[Number(i) + 1].workedDays) {
                     arrMostCommonDaysProjects.push(arrOfData[i])
             }
         }
