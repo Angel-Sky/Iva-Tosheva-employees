@@ -13,7 +13,7 @@ function solve() {
             reader.onload = function (e) {
                 fileData = e.target.result.split("\n");
                 // console.log(fileData)
-                console.log(formatData(fileData));
+                findTheLongestPeriod(formatData(fileData));
                 renderData(fileData);
             }
             reader.readAsText(uploadedFile.files[0]);
@@ -35,7 +35,17 @@ function solve() {
                 currentProject.data.push(empID, dateFrom, dateTo)
             }
         })
+        for (let project of projects) {
+            if (project.data.length < 6) {
+                let unnecessaryProjectIndex = projects.indexOf(project);
+                projects.splice(unnecessaryProjectIndex, 1)
+            }
+        }
         return projects;
+    }
+
+    function findTheLongestPeriod(data) {
+        console.log(data)
     }
 
     function renderData(data) {
