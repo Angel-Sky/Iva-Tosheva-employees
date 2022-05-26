@@ -15,8 +15,7 @@ function solve() {
             let reader = new FileReader();
             reader.onload = function (e) {
                 fileData = e.target.result.split("\n");
-                // renderData(filterProjects(fileData));
-                combineEmployees(formatData(fileData))
+                renderData(bestPairFilter(fileData));
             }
             reader.readAsText(uploadedFile.files[0]);
         } else {
@@ -59,7 +58,7 @@ function solve() {
                     let startTwo = Number(secondEmp.startDate);
                     let endTwo = Number(secondEmp.endDate);
                     let diff = 0;
-    
+
                     if ((startTwo >= startOne && startTwo <= endOne)) {
                         if (endTwo > endOne) {
                             diff = endOne - startTwo
@@ -83,11 +82,11 @@ function solve() {
         return obj;
     }
 
-    function filterProjects(fileData) {
-        let data = findCommonDays(formatData(fileData))
+    function bestPairFilter(fileData) {
+        let data = combineEmployees(formatData(fileData));
         let filtered = [];
         Object.values(data)
-            .sort((a, b) => (b.workedDays - a.workedDays))
+            .sort((a, b) => b.workedDays - a.workedDays)
             .reduce((prev, current) => {
                 if (prev.workedDays > current.workedDays) {
                     return prev;
@@ -104,27 +103,47 @@ function solve() {
         if (projects.length > 0) {
             let headers = ['Employee ID #1', 'Employee ID #2', 'Project ID', 'Days worked']
             let row = table.insertRow(-1);
-
+    
             for (let k = 0; k < headers.length; k++) {
                 let cell = row.insertCell(-1);
                 cell.innerHTML = headers[k];
             }
 
             for (let i = 0; i < projects.length; i++) {
-                let innerRow = table.insertRow(-1);
-                let cells = [projects[i].id, projects[i].data[0], projects[i].data[3], projects[i].workedDays];
-
-                for (let j = 0; j < cells.length; j++) {
-                    let cell = innerRow.insertCell(-1);
-                    cell.innerHTML = cells[j];
+                let { firstEmp, secondEmp, workedDays, details } = projects[i]
+                let cells = [];
+                Object.values(details)
+                    .forEach(({ project, days }) => {
+                        cells.push(firstEmp, secondEmp, project, days)
+                    })
+               
+                let matrix = arrToMatrix(cells, 4)
+                for (let j = 0; j < matrix.length; j++) {
+                    let innerRow = table.insertRow(-1);
+                    for (let k = 0; k < matrix[j].length; k++) {
+                        let cell = innerRow.insertCell(-1);
+                        cell.innerHTML = matrix[j][k];
+                    }
                 }
-
             }
+            
             output.innerHTML = "";
             output.appendChild(table);
         } else {
             error.innerHTML = "There isn't any pair of employees who have worked together"
             output.appendChild(error);
         }
+    }
+
+    function arrToMatrix(list, elementsPerSubArray) {
+        let matrix = [], i, k;
+        for (i = 0, k = -1; i < list.length; i++) {
+            if (i % elementsPerSubArray === 0) {
+                k++;
+                matrix[k] = [];
+            }
+            matrix[k].push(list[i]);
+        }
+        return matrix;
     }
 }
