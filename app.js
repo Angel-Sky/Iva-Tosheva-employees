@@ -57,27 +57,19 @@ function solve() {
                     let endOne = Number(firstEmp.endDate);
                     let startTwo = Number(secondEmp.startDate);
                     let endTwo = Number(secondEmp.endDate);
-                    let diff = 0;
 
-                    if ((startTwo >= startOne && startTwo <= endOne)) {
-                        if (endTwo > endOne) {
-                            diff = endOne - startTwo
-                        } else {
-                            diff = endTwo - startTwo
-                        }
-                    } else if (startOne >= startTwo && startOne <= endTwo) {
-                        if (endOne > endTwo) {
-                            diff = endTwo - endTwo;
-                        } else {
-                            diff = endOne - startOne;
-                        }
+                    if ((endOne <= endTwo && endOne > startTwo)
+                        || (endTwo <= endOne && endTwo > startOne)
+                    ) {
+                        let start = startOne > startTwo ? startOne : startTwo
+                        let end = endOne < endTwo ? endOne : endTwo
+                        let days = Math.ceil((end - start) / 86400)
+                        let pairID = `${firstEmp.empID}-${secondEmp.empID}`;
+
+                        obj[pairID] = obj[pairID] ?? { firstEmp: firstEmp.empID, secondEmp: secondEmp.empID, workedDays: 0, details: [] }
+                        obj[pairID].details.push({ project: Number(project), days })
+                        obj[pairID].workedDays += days
                     }
-                    let days = Math.ceil(diff / 86400)
-                    let pairID = `${firstEmp.empID}-${secondEmp.empID}`;
-
-                    obj[pairID] = obj[pairID] ?? { firstEmp: firstEmp.empID, secondEmp: secondEmp.empID, workedDays: 0, details: [] }
-                    obj[pairID].details.push({ project: Number(project), days })
-                    obj[pairID].workedDays += days
                 }
         return obj;
     }
@@ -103,7 +95,7 @@ function solve() {
         if (projects.length > 0) {
             let headers = ['Employee ID #1', 'Employee ID #2', 'Project ID', 'Days worked']
             let row = table.insertRow(-1);
-    
+
             for (let k = 0; k < headers.length; k++) {
                 let cell = row.insertCell(-1);
                 cell.innerHTML = headers[k];
@@ -116,7 +108,7 @@ function solve() {
                     .forEach(({ project, days }) => {
                         cells.push(firstEmp, secondEmp, project, days)
                     })
-               
+
                 let matrix = arrToMatrix(cells, 4)
                 for (let j = 0; j < matrix.length; j++) {
                     let innerRow = table.insertRow(-1);
@@ -126,7 +118,7 @@ function solve() {
                     }
                 }
             }
-            
+
             output.innerHTML = "";
             output.appendChild(table);
         } else {
