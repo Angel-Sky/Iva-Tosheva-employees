@@ -15,7 +15,8 @@ function solve() {
             let reader = new FileReader();
             reader.onload = function (e) {
                 fileData = e.target.result.split("\n");
-                renderData(filterProjects(fileData));
+                // renderData(filterProjects(fileData));
+                combineEmployees(formatData(fileData))
             }
             reader.readAsText(uploadedFile.files[0]);
         } else {
@@ -25,59 +26,61 @@ function solve() {
     }
 
     function formatData(data) {
-        let projects = [];
         data.shift();
+        let dataArr = [];
         data.forEach(row => {
-            let [empID, projectID, dateFrom, dateTo] = row.split(", ");
-            // dateTo = dateTo.substring(0, dateTo.length - 1)
-            let currentProject = projects.find(el => el.id == projectID)
+            let [empID, projectID, dateFrom, dateTo] = row.split(", ").map(x => x.toString());
+            dataArr.push([empID, projectID, dateFrom, dateTo])
+        })
 
-            if (dateTo == 'NULL' || dateTo == 'NULL\r') {
+        const projects = dataArr.reduce((proj, [empID, projectID, dateFrom, dateTo]) => {
+            if (dateTo == 'NULL' || dateTo == 'NULL\r' || dateTo == 'null' || dateTo == 'null\r') {
                 dateTo = new Date().toISOString().slice(0, 10);
             }
+            let startDate = Date.parse(dateFrom) / 1000;
+            let endDate = Date.parse(dateTo) / 1000;
+            proj[projectID] = proj[projectID] ?? [];
+            proj[projectID].push({ empID, startDate, endDate });
+            return proj;
+        }, {})
 
-            if (currentProject == undefined) {
-                projects.push(({ id: projectID, data: [empID, dateFrom, dateTo], workedDays: 0 }))
-            } else {
-                currentProject.data.push(empID, dateFrom, dateTo)
-            }
-        })
-        for (let project of projects) {
-            if (project.data.length < 6) {
-                let unnecessaryProjectIndex = projects.indexOf(project);
-                projects.splice(unnecessaryProjectIndex, 1)
-            }
-        }
         return projects;
     }
 
-    function findCommonDays(data) {
-        for (let project of data) {
-            let [empl1ID, startOne, endOne, empl2ID, startTwo, endTwo] = project.data;
-            let diff = 0;
-            startOne = Date.parse(startOne) / 1000;
-            endOne = Date.parse(endOne) / 1000;
-            startTwo = Date.parse(startTwo) / 1000;
-            endTwo = Date.parse(endTwo) / 1000;
+    function combineEmployees(data) {
+        let obj = {}
+        for (let project in data)
+            for (let i = 0; i < data[project].length - 1; i++)
+                for (let j = i + 1; j < data[project].length; j++) {
+                    let firstEmp = data[project][i];
+                    let secondEmp = data[project][j];
+                    let startOne = Number(firstEmp.startDate)
+                    let endOne = Number(firstEmp.endDate);
+                    let startTwo = Number(secondEmp.startDate);
+                    let endTwo = Number(secondEmp.endDate);
+                    let diff = 0;
+    
+                    if ((startTwo >= startOne && startTwo <= endOne)) {
+                        if (endTwo > endOne) {
+                            diff = endOne - startTwo
+                        } else {
+                            diff = endTwo - startTwo
+                        }
+                    } else if (startOne >= startTwo && startOne <= endTwo) {
+                        if (endOne > endTwo) {
+                            diff = endTwo - endTwo;
+                        } else {
+                            diff = endOne - startOne;
+                        }
+                    }
+                    let days = Math.ceil(diff / 86400)
+                    let pairID = `${firstEmp.empID}-${secondEmp.empID}`;
 
-            if ((startTwo >= startOne && startTwo <= endOne)) {
-                if (endTwo > endOne) {
-                    diff = endOne - startTwo
-                } else {
-                    diff = endTwo - startTwo
+                    obj[pairID] = obj[pairID] ?? { firstEmp: firstEmp.empID, secondEmp: secondEmp.empID, workedDays: 0, details: [] }
+                    obj[pairID].details.push({ project: Number(project), days })
+                    obj[pairID].workedDays += days
                 }
-            } else if (startOne >= startTwo && startOne <= endTwo) {
-                if (endOne > endTwo) {
-                    diff = endTwo - endTwo;
-                } else {
-                    diff = endOne - startOne;
-                }
-            }
-
-            diff = (Math.ceil(diff / 86400));
-            project.workedDays = diff;
-        }
-        return data;
+        return obj;
     }
 
     function filterProjects(fileData) {
